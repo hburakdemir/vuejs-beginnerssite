@@ -1,13 +1,13 @@
 <template>
-  <div class="flex flex-col md:flex-row min-h-screen p-8 ">
+  <div class="flex flex-col md:flex-row min-h-screen p-8 mt-40 ">
     <!-- Sol div: Form -->
     <div class="flex-1 flex flex-col items-center justify-start p-4">
-      <h3 class="text-2xl font-bold mb-6 text-center text-black dark:text-white">Contact Us</h3>
+      <h3 class="text-2xl font-bold mb-6 text-center text-primary dark:text-secondary">Contact Us</h3>
       
       <form @submit.prevent="handleSubmit" class="w-full max-w-md">
         <!-- Name -->
         <div class="mb-4 flex flex-col">
-          <label for="name" class="mb-1 text-sm font-medium bg-transparent text-gray-800 dark:text-white">
+          <label for="name" class="mb-1 text-sm font-medium bg-transparent text-gray-800 dark:text-secondary">
             Name
           </label>
           <input
@@ -16,13 +16,13 @@
             v-model="name"
             maxlength="30"
             placeholder="Please enter your name"
-            class="border-b bg-transparent focus:outline-none text-black dark:text-white focus:border-white py-2"
+            class="border-b bg-transparent focus:outline-none text-primary dark:text-secondary focus:border-white py-2"
           />
         </div>
 
         <!-- Surname -->
         <div class="mb-4 flex flex-col">
-          <label for="surname" class="mb-1 text-sm font-medium text-gray-800 dark:text-white">
+          <label for="surname" class="mb-1 text-sm font-medium text-gray-800 dark:text-secondary">
             Surname
           </label>
           <input
@@ -31,13 +31,13 @@
             maxlength="30"
             v-model="surname"
             placeholder="Please enter your surname"
-            class="border-b border-gray-400 bg-transparent text-black dark:text-white focus:outline-none focus:border-blue-500 py-2"
+            class="border-b border-gray-400 bg-transparent text-primary dark:text-secondary focus:outline-none focus:border-blue-500 py-2"
           />
         </div>
 
        
         <div class="mb-4 flex flex-col">
-          <label for="email" class="mb-1 text-sm font-medium text-gray-800 dark:text-white">
+          <label for="email" class="mb-1 text-sm font-medium text-gray-800 dark:text-secondary">
             Email
           </label>
           <input
@@ -46,13 +46,13 @@
             maxlength="30"
             v-model="email"
             placeholder="Please enter your email"
-            class="border-b border-gray-400 bg-transparent text-black dark:text-white focus:outline-none focus:border-white py-2"
+            class="border-b border-gray-400 bg-transparent text-primary dark:text-secondary focus:outline-none focus:border-white py-2"
           />
         </div>
 
         
         <div class="mb-4 flex flex-col">
-          <label for="phone" class="mb-1 text-sm font-medium text-gray-800 dark:text-white">
+          <label for="phone" class="mb-1 text-sm font-medium text-gray-800 dark:text-secondary">
             Phone
           </label>
           <input
@@ -61,26 +61,26 @@
              maxlength="15"
             v-model="phone"
             placeholder="Please enter your phone number"
-            class="border-b border-gray-400 bg-transparent text-black dark:text-white focus:outline-none focus:border-white py-2"
+            class="border-b border-gray-400 bg-transparent text-primary dark:text-secondary focus:outline-none focus:border-white py-2"
           />
         </div>
 
         <!-- Message -->
         <div class="mb-4 flex flex-col">
-          <label for="message" class="mb-1 text-sm font-medium text-gray-800 dark:text-white">
+          <label for="message" class="mb-1 text-sm font-medium text-gray-800 dark:text-secondary">
             Message
           </label>
           <textarea
             id="message"
             v-model="message"
             placeholder="Please enter your message"
-            class="border-b border-gray-400 bg-transparent text-black dark:text-white focus:outline-none focus:border-white py-2 h-28 resize-none"
+            class="border-b border-gray-400 bg-transparent text-primary dark:text-secondary focus:outline-none focus:border-white py-2 h-28 resize-none"
           ></textarea>
         </div>
 
         <button
           type="submit"
-          class="mt-4 px-6 py-2 bg-black bg-opacity-20 dark:bg-white text-black dark:text-black rounded hover:bg-blue-700"
+          class="mt-4 px-6 py-2 bg-primary bg-opacity-20 dark:bg-secondary text-primary dark:text-primary rounded hover:bg-blue-700"
         >
           Submit
         </button>
@@ -88,9 +88,9 @@
     </div>
 
     <!-- Sağ div: İletişim bilgileri -->
-    <div class="flex-1 flex flex-col justify-start text-center p-4 text-gray-800 dark:text-white">
+    <div class="flex-1 flex flex-col justify-start text-center p-4  text-gray-800 dark:text-secondary">
       <h4 class="text-xl font-bold mb-4">Our Contact Info</h4>
-      <p class="mb-2 mt-24">John Doe</p>
+      <p class="mb-2 mt-24 ">John Doe</p>
       <p class="mb-2">1234 Lorem Street</p>
       <p class="mb-2">Ipsum City, 56789</p>
       <p class="mb-2">Email: john.doe@example.com</p>

@@ -4,7 +4,7 @@
     <div class="container mx-auto px-4 py-8">
       <!-- Header -->
       <h1
-        class="mb-24 text-4xl font-bold text-center text-black dark:text-white md:text-5xl"
+        class="mb-24 text-4xl font-bold text-center text-primary dark:text-secondary md:text-5xl"
       >
         About Us
       </h1>
@@ -15,9 +15,9 @@
           <!-- Left Text Section -->
           <div class="flex-1">
             <div
-              class="flex flex-col h-full w-full p-4 text-white bg-black rounded-3xl justify-center dark:text-black dark:bg-white md:p-6"
+              class="flex flex-col h-full w-full p-4 text-secondary bg-primary rounded-3xl justify-center dark:text-primary dark:bg-secondary md:p-6"
             >
-              <h3 class="mb-4 text-xl text-white  dark:text-black text-center font-semibold">
+              <h3 class="mb-4 text-xl text-secondary  dark:text-primary text-center font-semibold">
                 Welcome to Our Fashion World
               </h3>
               <p class="mb-3 text-md text-center leading-relaxed">
@@ -60,7 +60,7 @@
           <div
             class="flex w-full text-center items-center justify-center md:w-1/2"
           >
-            <div class="w-full text-white dark:text-black p-6 bg-black rounded-3xl dark:bg-white">
+            <div class="w-full text-secondary dark:text-primary p-6 bg-primary rounded-3xl dark:bg-secondary">
               <h3 class="mb-4 text-xl text-red dark:text-red font-semibold">Our Vision</h3>
               <p class="mb-4 text-base leading-relaxed">
                 Our core mission is to be a pioneer in the fashion world, offer our customers the best shopping experience, and add value to the industry with a sustainable fashion approach.
@@ -98,7 +98,7 @@
     <!-- Overlay Button -->
     <div class="absolute inset-0 flex items-center justify-center">
       <button
-        class="px-6 py-3 bg-white text-black font-semibold rounded-3xl hover:bg-gray-100 transition-colors duration-200"
+        class="px-6 py-3 bg-secondary text-primary font-semibold rounded-3xl hover:bg-gray-100 transition-colors duration-200"
         @click="navigateToProducts"
       >
         Shop Now
@@ -111,6 +111,30 @@
   </div>
 </template>
 
-<script></script>
+<script setup>
+import axios from "axios";
+import { onMounted } from "vue";
+
+
+
+const fetchProductsAbout = async () => {
+  try {
+    const res = await axios.get("http://localhost:3000/api/products?section=about");
+
+  } 
+  catch (err) {
+    console.error("Error fetching products about:", err);
+  }
+};
+
+onMounted(() => {
+  fetchProductsAbout();
+
+})
+
+
+</script>
+
+
 
 <style scoped></style>
