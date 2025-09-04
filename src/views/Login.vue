@@ -247,6 +247,8 @@ const handleLogin = async () => {
 
     if (response.ok) {
       success.value = "Login successful! Redirecting...";
+
+      console.log("gelen user bilgileri",data)
       
       // Store token if provided
       if (data.token) {
@@ -261,7 +263,7 @@ const handleLogin = async () => {
       setTimeout(() => {
         // Replace with your desired redirect logic
         window.location.href = "/";
-      }, 1500);
+      }, 15000);
     } else {
       error.value = data.message || "Invalid email or password";
     }

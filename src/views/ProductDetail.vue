@@ -4,12 +4,22 @@
     class="grid md:grid-cols-3 md:pt-20 pt-10 p-4 w-screen h-screen bg-secondary dark:bg-primary"
   >
     <!-- Sol taraf (Resim) -->
-    <div class="flex justify-center rounded-3xl">
+    <div class="flex justify-center relative rounded-3xl">
       <img
         :src="product.images[0]"
         :alt="product.name"
         class="md:w-[500px] md:h-[800px] w-full h-full object-cover object-center rounded-3xl shadow-lg"
       />
+      <!-- Favori iconu -->
+      <span
+        @click="toggleFavorite"
+        class="absolute top-2 right-20 cursor-pointer text-3xl drop-shadow-lg"
+      >
+        <Icon
+          :icon="isFavorite ? 'mdi:heart' : 'mdi:heart-outline'"
+          :class="isFavorite ? 'text-red-500' : 'text-gray-400'"
+        />
+      </span>
     </div>
 
     <!-- Orta taraf (Bilgiler) -->
@@ -40,7 +50,10 @@
       <!-- Size / ShoeSize based on product.baseType -->
       <div v-if="product.baseType === 'clothes'">
         <label class="block mb-1">Size</label>
-        <select v-model="selectedSize" class="w-32 px-2  text-secondary dark:text-primary py-2 bg-primary dark:bg-secondary rounded-xl">
+        <select
+          v-model="selectedSize"
+          class="w-32 px-2 text-secondary dark:text-primary py-2 bg-primary dark:bg-secondary rounded-xl"
+        >
           <option value="" disabled>Select Size</option>
           <option v-for="s in clothingSizes" :key="s" :value="s">
             {{ s }}
@@ -79,79 +92,73 @@
     </div>
 
     <!-- Sağ taraf (Yorumlar) -->
-    <div class="border-l pl-6">
+    <div class="border-l pl-6 flex flex-col h-full">
       <h2 class="text-2xl font-semibold mb-4">Reviews</h2>
-      <div v-if="reviews && reviews.length > 0" class="space-y-3">
+
+      <!-- Yorum listesi -->
+      <div class="space-y-3 flex-1 overflow-y-auto">
         <div
-          v-for="(review, index) in reviews"
-          :key="index"
-          class="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800"
-        >
-          <p class="font-medium">{{ review.user }}</p>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            {{ review.comment }}
-          </p>
+  v-for="(review, index) in reviews"
+  :key="index"
+  class="relative p-4 border rounded-lg bg-gray-50 dark:bg-gray-800"
+>
+  <p class="font-medium">{{ review.user?.name || "Anonim" }}</p>
+  <p class="text-sm text-gray-600 dark:text-gray-400">{{ review.text }}</p>
+
+  <span
+    v-if="review.user?._id === currentUserId || isAdmin"
+    @click="deleteReview(review._id)"
+    class="absolute top-2 right-2 cursor-pointer text-gray-400 hover:text-red-500"
+  >
+    <Icon icon="ic:outline-delete" class="w-5 h-5" />
+  </span> 
+</div>
+<div class="mt-4">
+      <textarea
+        v-model="newReview"
+        placeholder="Write your review..."
+        class="w-full p-2 border rounded-lg resize-none"
+        rows="3"
+      ></textarea>
+      <button
+          @click="submitReview(product._id)"
+        class="mt-2 px-4 py-2 bg-primary text-secondary dark:bg-secondary dark:text-primary rounded-lg shadow hover:bg-opacity-80 transition"
+      >
+        Add Review
+      </button>
+
+      <!-- Hata veya başarı mesajları -->
+      <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="text-green-500 mt-2">
+        {{ successMessage }}
+      </p>
+    </div>
+</div>
+
         </div>
       </div>
-      <p v-else class="text-gray-500">No reviews yet.</p>
-    </div>
-  </div>
+      <p v-else class="text-gray-500 flex-1">No reviews yet.</p>
+
+    
+     
+   
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
-import { useRoute } from "vue-router";
+import { onMounted, ref } from "vue";
 
-const product = ref(null);
-const route = useRoute();
+import {useProduct} from "../customHook/productPage/useProduct";
+import {useReviews} from "../customHook/productPage/useReviews";
+
+const { product, isFavorite, fetchProduct, toggleFavorite } = useProduct();
+const { reviews, newReview, errorMessage, successMessage, fetchReviews, submitReview, deleteReview } = useReviews();
 
 const selectedSize = ref("");
 const selectedShoeSize = ref("");
 
-// Product verisini çek
-const fetchProduct = async () => {
-  const { data } = await axios.get(
-    `http://localhost:3000/api/products/${route.params.id}`
-  );
-  product.value = data;
-};
-onMounted(fetchProduct);
-
-// Size seçenekleri
-const clothingSizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
-const shoeSizes = Array.from({ length: 15 }, (_, i) => i + 36); // 36-50
-const accessorySizes = ["S", "M"];
-
-// Material link açma
-const openMaterial = () => {
-  if (product.value.material) {
-    window.open(
-      `https://en.wikipedia.org/wiki/${product.value.material}`,
-      "_blank"
-    );
-  }
-};
-
-// Add to Cart
-const addToCart = async () => {
-  try {
-    const payload = {
-      userId: "dummyUserId123", // gerçek kullanıcı id buraya
-      productId: product.value._id,
-      size: selectedSize.value || null,
-      shoeSize: selectedShoeSize.value || null,
-    };
-
-    const res = await axios.post(
-      "http://localhost:3000/api/addToCart",
-      payload
-    );
-    console.log("Added to cart:", res.data);
-    alert("Product added to cart!");
-  } catch (err) {
-    console.error(err);
-    alert("Error adding to cart");
-  }
-};
+onMounted(() => {
+  fetchProduct();
+  fetchReviews();
+});
 </script>
+

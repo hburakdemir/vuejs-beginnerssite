@@ -24,6 +24,18 @@
                 @click="$router.push(`/product/${product._id}`)"
                 loading="lazy"
               />
+              <!-- Favorite Icon -->
+<span
+  class="absolute top-2 right-2 text-3xl cursor-pointer drop-shadow-lg"
+  @click.stop="toggleFavorite(product._id)"
+>
+  <Icon
+    :icon="isFavorite(product._id) ? 'mdi:heart' : 'mdi:heart-outline'"
+    :class="isFavorite(product._id) ? 'text-red-500' : 'text-white'"
+  />
+</span>
+
+
 
 
               <!-- Product Name -->
@@ -86,8 +98,14 @@ const currentIndex = ref(0);
 const visibleItems = ref(4);
 const productList = ref([]);
 const activeImageIndexes = ref([]);
+const favorites = ref([]); // favori productId listesi
 
+// Kullanıcının token'ını al
+const getAuthToken = () => {
+  return sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+};
 
+// Products fetch
 const fetchProductsHero = async () => {
   try {
     const res = await axios.get("http://localhost:3000/api/products?section=hero");
@@ -101,21 +119,56 @@ const fetchProductsHero = async () => {
   }
 };
 
-onMounted(() => {
-  fetchProductsHero();
-  updateVisibleItems();
-  window.addEventListener("resize", updateVisibleItems);
-});
-onUnmounted(() => window.removeEventListener("resize", updateVisibleItems));
+// Favorites fetch
+const fetchFavorites = async () => {
+  try {
+    const token = getAuthToken();
+    if (!token) return;
 
-// büyük slider
+    const res = await axios.get("http://localhost:3000/api/favorites", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    // sadece productId listesi
+    favorites.value = res.data.favorites.map(f => f.product._id);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// Favori kontrol
+const isFavorite = (productId) => favorites.value.includes(productId);
+
+// Toggle
+const toggleFavorite = async (productId) => {
+  try {
+    const token = getAuthToken();
+    if (!token) return;
+
+    await axios.post(
+      `http://localhost:3000/api/favorites/${productId}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // Toggle mantığına göre favori listesi güncelle
+    if (favorites.value.includes(productId)) {
+      favorites.value = favorites.value.filter(id => id !== productId);
+    } else {
+      favorites.value.push(productId);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// Slider helpers
 function updateVisibleItems() {
   if (window.innerWidth < 768) visibleItems.value = 1;
   else if (window.innerWidth < 1024) visibleItems.value = 2;
   else visibleItems.value = 4;
 }
 
-// büyük slider
 const nextSlide = () => {
   if (currentIndex.value < productList.value.length - visibleItems.value) currentIndex.value++;
 };
@@ -123,12 +176,21 @@ const prevSlide = () => {
   if (currentIndex.value > 0) currentIndex.value--;
 };
 
-// mini slider
 const nextImage = (i) => {
   if (activeImageIndexes.value[i] < productList.value[i].images.length - 1) activeImageIndexes.value[i]++;
 };
 const prevImage = (i) => {
   if (activeImageIndexes.value[i] > 0) activeImageIndexes.value[i]--;
 };
+
+onMounted(() => {
+  fetchProductsHero();
+  fetchFavorites();
+  updateVisibleItems();
+  window.addEventListener("resize", updateVisibleItems);
+});
+onUnmounted(() => window.removeEventListener("resize", updateVisibleItems));
 </script>
+
+
 
