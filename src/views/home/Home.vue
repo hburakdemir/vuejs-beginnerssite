@@ -5,5 +5,5 @@
 </template>
 
 <script setup>
-import HeroSection from '@/components/layout/HeroSection.vue'
+import HeroSection from './HeroSection.vue';
 </script>

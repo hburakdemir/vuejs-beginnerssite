@@ -13,7 +13,7 @@
       <!-- Favori iconu -->
       <span
         @click="toggleFavorite"
-        class="absolute top-2 right-20 cursor-pointer text-3xl drop-shadow-lg"
+        class="absolute top-2 md:right-20 right-6  cursor-pointer text-3xl drop-shadow-lg"
       >
         <Icon
           :icon="isFavorite ? 'mdi:heart' : 'mdi:heart-outline'"
@@ -84,7 +84,7 @@
 
       <!-- Add to Cart Button -->
       <button
-        @click="addToCart"
+        @click="handleAddToCart(product._id)"
         class="mt-4 mx-1 px-6 py-2 bg-primary text-secondary dark:bg-secondary dark:text-primary rounded-lg shadow hover:bg-opacity-80 transition w-full"
       >
         Add to Cart
@@ -93,72 +93,139 @@
 
     <!-- Sağ taraf (Yorumlar) -->
     <div class="border-l pl-6 flex flex-col h-full">
-      <h2 class="text-2xl font-semibold mb-4">Reviews</h2>
+      <h2 class="text-2xl font-semibold mb-4 text-primary dark:text-secondary">Reviews</h2>
 
       <!-- Yorum listesi -->
       <div class="space-y-3 flex-1 overflow-y-auto">
-        <div
-  v-for="(review, index) in reviews"
-  :key="index"
-  class="relative p-4 border rounded-lg bg-gray-50 dark:bg-gray-800"
->
-  <p class="font-medium">{{ review.user?.name || "Anonim" }}</p>
-  <p class="text-sm text-gray-600 dark:text-gray-400">{{ review.text }}</p>
-
-  <span
-    v-if="review.user?._id === currentUserId || isAdmin"
-    @click="deleteReview(review._id)"
-    class="absolute top-2 right-2 cursor-pointer text-gray-400 hover:text-red-500"
+  <div
+    v-for="(review, index) in reviews"
+    :key="index"
+    class="relative p-4 border rounded-lg bg-secondary text-primary dark:bg-primary dark:text-secondary"
   >
-    <Icon icon="ic:outline-delete" class="w-5 h-5" />
-  </span> 
-</div>
-<div class="mt-4">
-      <textarea
-        v-model="newReview"
-        placeholder="Write your review..."
-        class="w-full p-2 border rounded-lg resize-none"
-        rows="3"
-      ></textarea>
-      <button
-          @click="submitReview(product._id)"
-        class="mt-2 px-4 py-2 bg-primary text-secondary dark:bg-secondary dark:text-primary rounded-lg shadow hover:bg-opacity-80 transition"
-      >
-        Add Review
-      </button>
+    <!-- Kullanıcı adı -->
+    <p class="font-medium capitalize border-b border-gray-400 dark:border-gray-600 pb-1">
+      {{ review.user?.name || "Anonim" }}
+    </p>
 
-      <!-- Hata veya başarı mesajları -->
-      <p v-if="errorMessage" class="text-red-500 mt-2">{{ errorMessage }}</p>
-      <p v-if="successMessage" class="text-green-500 mt-2">
-        {{ successMessage }}
-      </p>
-    </div>
-</div>
+    <!-- Review başlığı -->
+    <p class="mt-2 font-semibold">Review:</p>
 
+    <!-- Yorum metni -->
+    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+      {{ review.text }}
+    </p>
+
+    <!-- Silme ikonu -->
+    <span
+      v-if="review.user && review.user._id === userId"
+      @click="deleteReview(review._id)"
+      class="absolute top-2 right-2 cursor-pointer text-gray-400 hover:text-red-500"
+    >
+      <Icon icon="ic:outline-delete" class="w-5 h-5" />
+    </span>
+  </div>
+
+        <!-- Yorum ekleme alanı -->
+        <div class="mt-4">
+          <textarea
+            v-model="newReview"
+            placeholder="Write your review..."
+            class="w-full p-2 border rounded-lg resize-none"
+            rows="3"
+          ></textarea>
+          <button
+            @click="submitReview(product._id)"
+            class="mt-2 px-4 py-2 bg-primary text-secondary dark:bg-secondary dark:text-primary rounded-lg shadow hover:bg-opacity-80 transition"
+          >
+            Add Review
+          </button>
+
+          <!-- Hata veya başarı mesajları -->
+          <p v-if="errorMessage" class="text-red-500 mt-2">
+            {{ errorMessage }}
+          </p>
+          <p v-if="successMessage" class="text-green-500 mt-2">
+            {{ successMessage }}
+          </p>
         </div>
       </div>
-      <p v-else class="text-gray-500 flex-1">No reviews yet.</p>
-
-    
-     
-   
+    </div>
+  </div>
+  <p v-else class="text-gray-500 flex-1">No reviews yet.</p>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue";
+import { useProduct } from "../customHook/productPage/useProduct";
+import { useReviews } from "../customHook/productPage/useReviews";
+import { useCart } from "../customHook/cartPage/useCart";
+import Swal from "sweetalert2";
 
-import {useProduct} from "../customHook/productPage/useProduct";
-import {useReviews} from "../customHook/productPage/useReviews";
-
-const { product, isFavorite, fetchProduct, toggleFavorite } = useProduct();
-const { reviews, newReview, errorMessage, successMessage, fetchReviews, submitReview, deleteReview } = useReviews();
-
+// Reactive değişkenler
 const selectedSize = ref("");
 const selectedShoeSize = ref("");
+const userId = ref(null); // <<< önce tanımla
+
+// Backend'den gelen decodedToken varsa al
+const decodedTokenStr =
+  localStorage.getItem("decodedToken") ||
+  sessionStorage.getItem("decodedToken");
+if (decodedTokenStr) {
+  try {
+    const decodedToken = JSON.parse(decodedTokenStr);
+    userId.value = decodedToken.userId; // artık reactive
+  } catch (err) {
+    console.error("Decoded token parse hatası:", err);
+  }
+}
+
+
+const { product, isFavorite, fetchProduct, toggleFavorite 
+
+} = useProduct();
+const {
+  reviews,
+  newReview,
+  errorMessage,
+  successMessage,
+  fetchReviews,
+  submitReview,
+  deleteReview,
+} = useReviews();
+
+const  {addToCart,message,messageType
+} = useCart();
+
 
 onMounted(() => {
   fetchProduct();
   fetchReviews();
+  console.log(reviews.value);
 });
+
+
+
+const handleAddToCart = async (productId) => {
+  await addToCart(productId);
+
+  // useCart içindeki reactive ref'leri kullan
+  if (!message.value) return;
+
+  Swal.fire({
+  timer:3000,
+   timerProgressBar: true,
+  text: message.value,
+  icon: messageType.value === "success" ? "success" : "error",
+  showConfirmButton: true,
+  confirmButtonText: "OK",
+  customClass: {
+    popup: "my-swal-popup",
+    confirmButton: "my-swal-button",
+    content: "my-swal-content"
+  }
+});
+
+};
 </script>
+
 
