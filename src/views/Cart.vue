@@ -87,7 +87,7 @@
 import { onMounted, watch } from "vue";
 import { useCart } from "../customHook/cartPage/useCart";
 
-const { cart, fetchCart } = useCart();
+const { cart, fetchCart,addToCart, removeFromCart} = useCart();
 
 onMounted(async () => {
   await fetchCart(); // fetch tamamlanana kadar bekle
