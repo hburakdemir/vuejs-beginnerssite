@@ -139,7 +139,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import { Icon } from "@iconify/vue";
 import { useCart } from "../customHook/cartPage/useCart";
 
-const isLoggedIn = ref(false);
+const isLoggedIn = ref(!!localStorage.getItem("authToken"));
 const user = ref(null);
 const isDropdownOpen = ref(false);
 const isDarkMode = ref(localStorage.getItem("theme") === "dark");
@@ -160,6 +160,12 @@ const handleClickOutside = (e) => {
   const dropdown = document.querySelector(".relative > div");
   if (dropdown && !dropdown.contains(e.target)) {
     isDropdownOpen.value = false;
+  }
+};
+
+const handleStorageChange = (event) => {
+  if (event.key === "authToken" && !event.newValue) {
+    isLoggedIn.value = false;
   }
 };
 onMounted(() => {
@@ -216,6 +222,16 @@ const { fetchCart, cart } = useCart();
 const totalItems = computed(() => {
   return cart.value.products.reduce((sum, item) => sum + item.quantity, 0);
 });
+
+
+onMounted(() => {
+  window.addEventListener("storage", handleStorageChange);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("storage", handleStorageChange);
+});
+
 
 onMounted(() => {
   fetchCart();

@@ -10,13 +10,17 @@ export function fetchProducts(section) {
   const visibleItems = ref(4);
 
   const getAuthToken = () => {
-    return sessionStorage.getItem("authToken") || localStorage.getItem("authToken");
+    return (
+      sessionStorage.getItem("authToken") || localStorage.getItem("authToken")
+    );
   };
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/products?section=${section}`);
-      productList.value = res.data.map(p => ({
+      const res = await axios.get(
+        `http://localhost:3000/api/products?section=${section}`
+      );
+      productList.value = res.data.map((p) => ({
         ...p,
         images: Array.isArray(p.images) ? p.images : [p.images],
       }));
@@ -34,7 +38,7 @@ export function fetchProducts(section) {
       const res = await axios.get("http://localhost:3000/api/favorites", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      favorites.value = res.data.favorites.map(f => f.product._id);
+      favorites.value = res.data.favorites.map((f) => f.product._id);
     } catch (err) {
       console.error(err);
     }
@@ -47,12 +51,16 @@ export function fetchProducts(section) {
       const token = getAuthToken();
       if (!token) return;
 
-      await axios.post(`http://localhost:3000/api/favorites/${productId}`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.post(
+        `http://localhost:3000/api/favorites/${productId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (favorites.value.includes(productId)) {
-        favorites.value = favorites.value.filter(id => id !== productId);
+        favorites.value = favorites.value.filter((id) => id !== productId);
       } else {
         favorites.value.push(productId);
       }
@@ -69,18 +77,21 @@ export function fetchProducts(section) {
   }
 
   const nextSlide = () => {
-    if (currentIndex.value < productList.value.length - visibleItems.value) currentIndex.value++;
+    currentIndex.value = (currentIndex.value + 1) % productList.value.length;
   };
+
   const prevSlide = () => {
-    if (currentIndex.value > 0) currentIndex.value--;
+    currentIndex.value =(currentIndex.value - 1 + productList.value.length) % productList.value.length;
   };
 
   const nextImage = (i) => {
-    if (activeImageIndexes.value[i] < productList.value[i].images.length - 1) activeImageIndexes.value[i]++;
-  };
-  const prevImage = (i) => {
-    if (activeImageIndexes.value[i] > 0) activeImageIndexes.value[i]--;
-  };
+  activeImageIndexes.value[i] =(activeImageIndexes.value[i] + 1) % productList.value[i].images.length;
+};
+
+const prevImage = (i) => {
+  activeImageIndexes.value[i] =(activeImageIndexes.value[i] - 1 + productList.value[i].images.length) % productList.value[i].images.length;
+};
+
 
   onMounted(() => {
     fetchProducts();
@@ -101,7 +112,6 @@ export function fetchProducts(section) {
     nextSlide,
     prevSlide,
     nextImage,
-    prevImage
+    prevImage,
   };
 }
-
