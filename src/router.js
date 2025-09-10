@@ -6,8 +6,12 @@ import About from "./views/AboutUs.vue";
 import Contact from "./views/Contact.vue";
 import Register from "./views/Register.vue";
 import Login from "./views/Login.vue";
+
+import Profile from "./views/profile/Profile.vue";
+import Favorites from "./views/profile/Favorites.vue";
+import Reviews from "./views/profile/Reviews.vue";
+import HomeContent from "./views/home/HomeContet.vue";
 import Cart from "./views/Cart.vue";
-import Profile from "./views/Profile.vue";
 
 const routes = [
   { path: "/register", name: "Register", component: Register },
@@ -15,23 +19,13 @@ const routes = [
   { path: "/", name: "Home", component: Home },
   { path: "/about", name: "About", component: About },
   { path: "/contact", name: "Contact", component: Contact },
-  {
-    path: "/cart",
-    name: "Cart",
-    component: Cart,
-    meta: { requiresAuth: true }, //meta login sayfası yönlendire
-  },
-  {
-    path: "/profile",
-    name: "Profile",
-    component: Profile,
-    meta: { requiresAuth: true }, 
-  },
-  {
-    path: "/product/:id",
-    name: "ProductDetail",
-    component: () => import("@/views/ProductDetail.vue"),
-  },
+  { path: "/products",name: "HomeContent",component: HomeContent, },
+  { path: "/cart",name: "Cart",component: Cart, meta: { requiresAuth: true } },
+  { path: "/profile",name: "Profile",component: Profile, meta: { requiresAuth: true }, },
+  { path: "/profile/favorites",name: "Favorites",component: Favorites, meta: { requiresAuth: true }, },
+  { path: "/favorites",name: "Favorites",component: Favorites, meta: { requiresAuth: true }, },
+  { path: "/profile/reviews",name: "Reviews",component: Reviews, meta: { requiresAuth: true }, },
+  { path: "/product/:id",name: "ProductDetail",component: () => import("@/views/ProductDetail.vue"),},
 ];
 
 const router = createRouter({
@@ -45,22 +39,22 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth) {
     if (!token) {
-      // Token hiç yoksa
+     
       return next({ name: "Login", query: { redirect: to.fullPath } });
     }
 
     try {
       const decoded = jwtDecode(token);
-      const now = Date.now() / 1000; // saniye cinsinden
+      const now = Date.now() / 1000; 
 
       if (decoded.exp < now) {
-        // Token süresi dolmuş
+       
         localStorage.removeItem("authToken");
         alert("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
         return next({ name: "Login", query: { redirect: to.fullPath } });
       }
     } catch (err) {
-      // Token bozuksa
+      
       localStorage.removeItem("authToken");
       return next({ name: "Login" });
     }

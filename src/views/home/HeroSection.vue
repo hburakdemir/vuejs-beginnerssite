@@ -19,7 +19,7 @@
           <div
             v-for="(product, i) in productList"
             :key="i"
-            class="flex-none px-2 w-1/4"
+            class="flex-none px-2 md:w-1/4 w-full"
           >
             <div class="relative w-full h-[500px] rounded-lg overflow-hidden">
               <!-- Image -->
@@ -111,7 +111,6 @@ import Swal from "sweetalert2";
 const {
   productList,
   activeImageIndexes,
-  favorites,
   currentIndex,
   visibleItems,
   isFavorite,
